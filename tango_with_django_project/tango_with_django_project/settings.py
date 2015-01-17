@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
+
+STATIC_PATH = os.path.join(BASE_DIR, 'static')
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -23,6 +28,12 @@ SECRET_KEY = '&kwxeskvvdt)wcd&uh%-4(&3@$yhf)=lm7j8udvbn3*u_yxdq+'
 DEBUG = True
 
 TEMPLATE_DEBUG = True
+
+TEMPLATE_DIRS = [
+#Avoid hard coding the paths, as it is VERY bad practice
+
+TEMPLATE_PATH,
+]
 
 ALLOWED_HOSTS = []
 
@@ -82,3 +93,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    STATIC_PATH,
+)
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
