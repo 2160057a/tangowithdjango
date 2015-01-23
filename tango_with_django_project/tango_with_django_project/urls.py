@@ -12,7 +12,8 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rango/', include('rango.urls')),
-    url(r'^rango/about/', include('rango.urls'))
+    url(r'^rango/about/', include('rango.urls')),
+    url(r'^rango/category/', include('rango.urls'))
 )
 
 if not settings.DEBUG:

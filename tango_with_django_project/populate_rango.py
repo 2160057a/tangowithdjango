@@ -14,11 +14,13 @@ def populate():
 
     add_page(cat=python_cat,
         title="Official Python Tutorial",
-        url="http://docs.python.org/2/tutorial/")
+        url="http://docs.python.org/2/tutorial/",
+        views = 20)
 
     add_page(cat=python_cat,
         title="How to Think like a Computer Scientist",
-        url="http://www.greenteapress.com/thinkpython/")
+        url="http://www.greenteapress.com/thinkpython/",
+        views = 300)
 
     add_page(cat=python_cat,
         title="Learn Python in 10 Minutes",
@@ -34,7 +36,8 @@ def populate():
 
     add_page(cat=django_cat,
         title="Django Rocks",
-        url="http://www.djangorocks.com/")
+        url="http://www.djangorocks.com/",
+        views = 39)
 
     add_page(cat=django_cat,
         title="How to Tango with Django",
@@ -58,11 +61,13 @@ def populate():
 
     add_page(cat = student_cat,
         title = "GitHub",
-        url = "https://github.com/2160057a/tangowithdjango")
+        url = "https://github.com/2160057a/tangowithdjango", 
+        views = 90)
 
     add_page(cat = student_cat,
         title = "Python anywhere",
-        url = "https://www.pythonanywhere.com/user/2160057a/consoles/")
+        url = "https://www.pythonanywhere.com/user/2160057a/consoles/",
+        views = 5000)
 
     # Print out what we have added to the user.
     for c in Category.objects.all():
@@ -74,7 +79,7 @@ def add_page(cat, title, url, views=0):
     return p
 
 def add_cat(name, views=0, likes=0):
-    c = Category.objects.get_or_create(name=name)[0]
+    c = Category.objects.get_or_create(name=name, views = views, likes = likes)[0]
     return c
 
 # Start execution here!
