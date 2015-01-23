@@ -57,7 +57,7 @@ def populate():
 
     student_cat = add_cat("Jaakko Alasuvanto",
         views = 0,
-        likes = 6000)
+        likes = 60000)
 
     add_page(cat = student_cat,
         title = "GitHub",
