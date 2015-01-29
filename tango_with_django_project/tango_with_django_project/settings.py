@@ -26,7 +26,7 @@ SECRET_KEY = '&kwxeskvvdt)wcd&uh%-4(&3@$yhf)=lm7j8udvbn3*u_yxdq+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+#Groups: a method of applying permissions to more than one user.
 TEMPLATE_DEBUG = True
 
 TEMPLATE_DIRS = [
@@ -100,3 +100,5 @@ STATICFILES_DIRS = (
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+LOGIN_URL = '/rango/login/'
