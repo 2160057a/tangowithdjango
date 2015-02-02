@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Rango</title>
-    </head>
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block title %} Add a new category {% endblock %}
+
+
+{% block body_block %}
+
+
 
     <body>
         <h1>Add a Category</h1>
@@ -24,4 +29,4 @@
         </form>
     </body>
 
-</html>
+{% endblock %}

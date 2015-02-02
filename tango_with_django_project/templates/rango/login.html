@@ -1,9 +1,13 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <!-- Is anyone getting tired of repeatedly entering the header over and over?? -->
-        <title>Rango</title>
-    </head>
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+
+{% block title %}Login{% endblock %}
+
+{% block body_block %}
+
+
 
     <body>
         {% if login_failed %}
@@ -13,8 +17,10 @@
         {% endif %}
 
         <h1>Login to Rango</h1>
-        <a href="/rango/register/">Not yet registered?</a> <br /> <p>
-        <form id="login_form" method="post" action="/rango/login/">
+        <!-- Register link is obscure with the inheritance from base.html -->
+        <a href="{% url 'register' %}">Not yet registered?</a> <br /> <p>
+        <!-- Delete the register link next time -->
+        <form id="login_form" method="post" action="{% url 'login' %}">
             {% csrf_token %}
             Username: <input type="text" name="username" value="" size="50" />
             <br />
@@ -25,4 +31,6 @@
         </form>
 
     </body>
-</html>
+
+
+{% endblock %}
