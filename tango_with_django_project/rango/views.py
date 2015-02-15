@@ -14,22 +14,61 @@ from rango.models import Category, Page
 from rango.forms import CategoryForm, PageForm
 from rango.forms import UserForm, UserProfileForm
 
+from datetime import datetime
+
 
 def index(request):
-	category_list = Category.objects.order_by('-likes')[:5]
 
-	most_viewed_pages = Page.objects.order_by('-views')[:5]
-	context_dict = {'most_viewed_pages': most_viewed_pages, 'categories': category_list}
+    category_list = Category.objects.order_by('-likes')[:5]
+    page_list = Page.objects.order_by('-views')[:5]
 
-	return render(request, 'rango/index.html', context_dict)
+    context_dict = {'categories': category_list, 'pages': page_list}
+
+    visits = request.session.get('visits')
+    if not visits:
+        visits = 1
+    reset_last_visit_time = False
+
+    last_visit = request.session.get('last_visit')
+    if last_visit:
+        last_visit_time = datetime.strptime(last_visit[:-7], "%Y-%m-%d %H:%M:%S")
+
+        if (datetime.now() - last_visit_time).seconds > 0:
+            # ...reassign the value of the cookie to +1 of what it was before...
+            visits = visits + 1
+            # ...and update the last visit cookie, too.
+            reset_last_visit_time = True
+    else:
+        # Cookie last_visit doesn't exist, so create it to the current date/time.
+        reset_last_visit_time = True
+
+    if reset_last_visit_time:
+        request.session['last_visit'] = str(datetime.now())
+        request.session['visits'] = visits
+    context_dict['visits'] = visits
+
+
+    response = render(request,'rango/index.html', context_dict)
+
+    return response
 
 	
 
 def about(request):
 
-	context_dict = {'jaakko': "This tutorial has been put together by Jaakko Alasuvanto, 2160057"}
+    # If the visits session varible exists, take it and use it.
+# If it doesn't, we haven't visited the site so set the count to zero.
+    if request.session.get('visits'):
+        count = request.session.get('visits')
+    else:
+        count = 0
 
-	return render(request, 'rango/about.html', context_dict)
+    # remember to include the visit data
+
+    context_dict = {'jaakko': "This tutorial has been put together by Jaakko Alasuvanto, 2160057"}
+    context_dict['visits'] = count
+
+    return render(request, 'rango/about.html', context_dict)
 
 def category(request, category_name_slug):
 
@@ -121,6 +160,8 @@ def register(request):
 
     #Boolean value for telling the template if the registeration was succesful or not.
     # Set to false initially, changed to True when succesful registeration has occurred.
+
+
 
     registered = False
 

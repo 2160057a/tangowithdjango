@@ -8,6 +8,7 @@
 
         <h1>Rango says...</h1>
         here is the about page! <p> <strong>{{ jaakko }}</strong><br />
+        This page has been visited {{ visits }} times.
         <li><a href="{% url 'index' %}">Index Page</a></li>
         <img src="{% static "images/jaakko.jpg" %}" alt="Picture of Rango" /> <!-- New line -->
     {% endblock %}
