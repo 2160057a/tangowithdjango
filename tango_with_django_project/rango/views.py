@@ -19,6 +19,10 @@ from datetime import datetime
 
 def index(request):
 
+    #Need to find a more elegant solution!!!!
+    if (request.path =='/accounts/password/change/done/'):
+        return HttpResponseRedirect('/rango/')
+
     category_list = Category.objects.order_by('-likes')[:5]
     page_list = Page.objects.order_by('-views')[:5]
 

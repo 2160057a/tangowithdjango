@@ -13,6 +13,8 @@ class MyRegistrationView(RegistrationView):
         return '/rango/'
 
 
+
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'tango_with_django_project.views.home', name='home'),
@@ -21,6 +23,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rango/', include('rango.urls')),
     url(r'^accounts/register/$', MyRegistrationView.as_view(), name='registration_register'),
+    url(r'^accounts/password/change/done/$', include('rango.urls')),
     (r'^accounts/', include('registration.backends.simple.urls')),
 )
 
