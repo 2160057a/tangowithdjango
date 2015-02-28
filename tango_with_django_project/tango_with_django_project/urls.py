@@ -25,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^accounts/register/$', MyRegistrationView.as_view(), name='registration_register'),
     url(r'^accounts/password/change/done/$', include('rango.urls')),
     (r'^accounts/', include('registration.backends.simple.urls')),
+    #HOW TO NAME THE BACKEND URLS????
 )
 
 if not settings.DEBUG:
