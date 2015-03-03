@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+
+{% block title %}Login{% endblock %}
+
+{% block body_block %}
+
+
+
+    <body>
+        {% if login_failed %}
+
+        <li>Either the username or the password were incorrect</li>
+
+        {% endif %}
+
+        <h1>Login to Rango</h1>
+        <!-- Register link is obscure with the inheritance from base.html -->
+        <a href="{% url 'register' %}">Not yet registered?</a> <br /> <p>
+        <!-- Delete the register link next time -->
+        <form id="login_form" method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            Username: <input type="text" name="username" value="" size="50" />
+            <br />
+            Password: <input type="password" name="password" value="" size="50" />
+            <br />
+
+            <input type="submit" value="submit" />
+        </form>
+
+    </body>
+
+
+{% endblock %}
