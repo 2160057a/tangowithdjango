@@ -68,3 +68,15 @@ def run_query(search_terms):
 
     # Return the list of results to the calling function.
     return results
+
+def main():
+    search_input = raw_input("What to search? \n")
+    results = run_query(search_input)
+    for i in range(len(results)):
+        print "Result number: " + str(i+1)
+        print "Summary: " + results[i]['summary']
+        print "URL: " + results[i]['link']
+
+
+if __name__ == '__main__':
+    main()

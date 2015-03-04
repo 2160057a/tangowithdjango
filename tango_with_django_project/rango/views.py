@@ -14,6 +14,9 @@ from rango.models import Category, Page
 from rango.forms import CategoryForm, PageForm
 from rango.forms import UserForm, UserProfileForm
 
+from rango.bing_search import run_query
+
+
 from datetime import datetime
 
 
@@ -264,3 +267,17 @@ def user_logout(request):
 
     return HttpResponseRedirect('/rango/')
     """
+
+
+def search(request):
+
+    result_list = []
+
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
+
+        if query:
+            # Run our Bing function to get the results list!
+            result_list = run_query(query)
+
+    return render(request, 'rango/search.html', {'result_list': result_list})
