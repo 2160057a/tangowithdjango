@@ -5,11 +5,16 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 
+from django.contrib.auth.models import User
+
 from django.contrib.auth.decorators import login_required
 
 from django.core.urlresolvers import reverse
 
+from django.shortcuts import redirect
+
 from rango.models import Category, Page
+from rango.models import UserProfile
 
 from rango.forms import CategoryForm, PageForm
 from rango.forms import UserForm, UserProfileForm
@@ -22,9 +27,6 @@ from datetime import datetime
 
 def index(request):
 
-    #Need to find a more elegant solution!!!!
-    if (request.path =='/accounts/password/change/done/'):
-        return HttpResponseRedirect('/rango/')
 
     category_list = Category.objects.order_by('-likes')[:5]
     page_list = Page.objects.order_by('-views')[:5]
@@ -78,38 +80,32 @@ def about(request):
     return render(request, 'rango/about.html', context_dict)
 
 def category(request, category_name_slug):
+    context_dict = {}
+    context_dict['result_list'] = None
+    context_dict['query'] = None
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
 
-	#Create the context dictionary to be passed for the render
-	context_dict = {}
+        if query:
+            # Run our Bing function to get the results list!
+            result_list = run_query(query)
 
-	try:
-		#Can we find a category name slug with the given name?
-		#If not, the .get() method raises a DoesNotExist exception
-		#So the .get() method returns one model instance or raises hell
-		category = Category.objects.get(slug = category_name_slug)
-		context_dict['category_name'] = category.name
+            context_dict['result_list'] = result_list
+            context_dict['query'] = query
 
-		#Retrieve all of the associated pages
-		#NOTE!! Filter returns >= 1 model instances.
-		pages = Page.objects.filter(category=category)
+    try:
+        category = Category.objects.get(slug=category_name_slug)
+        context_dict['category_name'] = category.name
+        pages = Page.objects.filter(category=category).order_by('-views')
+        context_dict['pages'] = pages
+        context_dict['category'] = category
+    except Category.DoesNotExist:
+        pass
 
-		#Adds our results list to template context
-		context_dict['pages'] = pages
+    if not context_dict['query']:
+        context_dict['query'] = category.name
 
-		#Also add the category objects from the database to the context dictionary.
-		#We'll use this in the template to verify that the category exists.
-		context_dict['category'] = category
-
-		#Add category_name_slug to context_dict 
-		context_dict['category_name_slug'] = category_name_slug
-
-	except Category.DoesNotExist:
-		#We get here if we didin't find the secified category
-		#Don't do anything  the template displays the "no category" message for us.
-		pass
-
-
-	return render(request, 'rango/category.html', context_dict)
+    return render(request, 'rango/category.html', context_dict)
 
 @login_required
 def add_category(request):
@@ -162,57 +158,7 @@ def add_page(request, category_name_slug):
     context_dict = {'form':form, 'category': cat}
 
     return render(request, 'rango/add_page.html', context_dict)
-"""
-def register(request):
 
-    #Boolean value for telling the template if the registeration was succesful or not.
-    # Set to false initially, changed to True when succesful registeration has occurred.
-
-
-
-    registered = False
-
-    if request.method == 'POST':
-
-        #Grab the information from the raw for information
-        user_form = UserForm(data = request.POST)
-        profile_form = UserProfileForm(data = request.POST)
-
-        if user_form.is_valid() and profile_form.is_valid():
-            #Save the user's form data to the database
-            user = user_form.save()
-
-            #Now we hash the password with set_password method
-            #Once hashed, we can update the user object
-
-            user.set_password(user.password)
-            user.save()
-
-            #Sorting out the UserProfile instance
-            #Since we need to set the user attribute ourselves, we set commit=False
-            #This delays saving the model until we're ready to avoid integrity problems.
-
-            profile = profile_form.save(commit=False)
-            profile.user = user
-
-            #Was a picture submitted?
-            #We need to get it from the input form and put it in the UserProfile model
-            if 'picture' in request.FILES:
-                profile.picture = request.FILES['picture']
-
-            profile.save()
-            registered = True 
-        else:
-            print user_form.errors, profile_form.errors
-
-    else:
-        user_form = UserForm()
-        profile_form = UserProfileForm()
-
-    return render(request,
-        'rango/register.html',
-        {'user_form':user_form, 'profile_form':profile_form, 'registered':registered} )
-"""
 """
 def user_login(request):
 
@@ -281,3 +227,120 @@ def search(request):
             result_list = run_query(query)
 
     return render(request, 'rango/search.html', {'result_list': result_list})
+
+def track_url(request):
+
+    url = '/rango/'
+    page_id = None
+
+    if request.method == 'GET':
+        if 'page_id' in request.GET:
+            page_id = request.GET['page_id']
+            try:
+                page = Page.objects.get(id=page_id)
+                page.views = page.views + 1
+                page.save()
+                url = page.url
+            except:
+                pass
+
+
+
+    return redirect(url)
+
+def register_profile(request):
+
+
+
+    context_dict = {}
+
+
+
+    if request.method == 'POST':
+        
+        profile_form = UserProfileForm(request.POST)
+        if profile_form.is_valid():
+            profile = profile_form.save(commit=False)
+            user = User.objects.get(id=request.user.id)
+            profile.user = user
+            profile.picture = request.FILES.get('picture')
+            profile.save()
+            return HttpResponseRedirect('/rango/')
+
+    else:
+        profile_form = UserProfileForm(request.GET)
+        context_dict['profile_form'] = profile_form
+        return render(request, 'rango/profile_registration.html', context_dict)
+
+
+@login_required
+def profile(request, username):
+    #How to edit??
+    currentUser = User.objects.get(username=username)
+
+    try:
+        userProfile = UserProfile.objects.get(user = currentUser)
+    except:
+        userProfile = None
+
+    return render(request, 'rango/profile.html', {'currentUser':currentUser, 'userProfile':userProfile})
+
+
+def users(request):
+    context_dict = {}
+    users = User.objects.order_by('username')
+    context_dict['users'] = users
+    return render(request, 'rango/users.html', context_dict)
+
+
+    """
+def register(request):
+
+    #Boolean value for telling the template if the registeration was succesful or not.
+    # Set to false initially, changed to True when succesful registeration has occurred.
+
+
+
+    registered = False
+
+    if request.method == 'POST':
+
+        #Grab the information from the raw for information
+        user_form = UserForm(data = request.POST)
+        profile_form = UserProfileForm(data = request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            #Save the user's form data to the database
+            user = user_form.save()
+
+            #Now we hash the password with set_password method
+            #Once hashed, we can update the user object
+
+            user.set_password(user.password)
+            user.save()
+
+            #Sorting out the UserProfile instance
+            #Since we need to set the user attribute ourselves, we set commit=False
+            #This delays saving the model until we're ready to avoid integrity problems.
+
+            profile = profile_form.save(commit=False)
+            profile.user = user
+
+            #Was a picture submitted?
+            #We need to get it from the input form and put it in the UserProfile model
+            if 'picture' in request.FILES:
+                profile.picture = request.FILES['picture']
+
+            profile.save()
+            registered = True 
+        else:
+            print user_form.errors, profile_form.errors
+
+    else:
+        user_form = UserForm()
+        profile_form = UserProfileForm()
+
+    return render(request,
+        'rango/register.html',
+        {'user_form':user_form, 'profile_form':profile_form, 'registered':registered} )
+"""

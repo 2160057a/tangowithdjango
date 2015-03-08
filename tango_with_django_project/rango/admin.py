@@ -5,6 +5,7 @@ class PageAdmin(admin.ModelAdmin):
 
 	list_display = ('title', 'category', 'url', 'views')
 
+
 class CategoryAdmin(admin.ModelAdmin):
 	prepopulated_Fields ={'slug':('name',)}
 
